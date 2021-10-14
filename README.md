@@ -15,6 +15,9 @@ You can pass the xkcd number to view a specific comic strip:
 $ ./xkcd 292
 ```
 
+## Screen Shot
+![screen shot](screenshot.png)
+
 ## Build Instruction
 Just clone the repository and build the executable with *fpm*:
 ```
