@@ -12,7 +12,7 @@ libraries:
 
 You can pass the xkcd number to view a specific comic strip:
 ```
-$ ./xkcd 420
+$ ./xkcd 292
 ```
 
 ## Build Instruction

@@ -140,6 +140,7 @@ contains
         if (.not. associated(data)) return
         call c_f_str_ptr(ptr, chunk, nmemb)
 
+        if (.not. allocated(data%json)) data%json = ''
         data%json = data%json // chunk
 
         xkcd_json_callback = nmemb
@@ -160,11 +161,12 @@ contains
         if (.not. c_associated(ptr)) return
         if (.not. c_associated(client_data)) return
 
+        call c_f_pointer(client_data, file_unit)
+        if (.not. associated(file_unit)) return
+
         inquire (unit=file_unit, iostat=stat)
         if (stat /= 0) return
 
-        call c_f_pointer(client_data, file_unit)
-        if (.not. associated(file_unit)) return
         call c_f_str_ptr(ptr, chunk, nmemb)
 
         write (file_unit, iostat=stat) chunk
@@ -243,9 +245,6 @@ contains
         if (present(stat)) stat = -1
         if (len_trim(url) == 0) return
 
-        curl_ptr = curl_easy_init()
-        if (.not. c_associated(curl_ptr)) return
-
         open (access  = 'stream', &
               action  = 'write', &
               file    = trim(file_path), &
@@ -254,6 +253,9 @@ contains
               newunit = file_unit, &
               status  = 'replace')
         if (rc /= 0) return
+
+        curl_ptr = curl_easy_init()
+        if (.not. c_associated(curl_ptr)) return
 
         rc = curl_easy_setopt(curl_ptr, CURLOPT_DEFAULT_PROTOCOL, 'https' // c_null_char)
         rc = curl_easy_setopt(curl_ptr, CURLOPT_URL,              trim(url) // c_null_char)
