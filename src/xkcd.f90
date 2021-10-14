@@ -3,6 +3,8 @@ module cairo
     implicit none
     private
 
+    integer, public, parameter :: CAIRO_STATUS_SUCCESS = 0
+
     public :: cairo_create
     public :: cairo_destroy
     public :: cairo_image_surface_create_from_png
@@ -13,8 +15,6 @@ module cairo
     public :: cairo_surface_destroy
     public :: cairo_surface_status
     public :: cairo_xlib_surface_create
-
-    integer, public, parameter :: CAIRO_STATUS_SUCCESS = 0
 
     interface
         ! cairo_t * cairo_create(cairo_surface_t *target)
@@ -101,7 +101,7 @@ module xkcd
     character(len=*), parameter :: API_BASE = 'https://xkcd.com/'
     character(len=*), parameter :: API_JSON = 'info.0.json'
 
-    type, public :: data_type
+    type, public :: xkcd_data_type
         character(len=:), allocatable :: json
         character(len=:), allocatable :: month
         integer                       :: num
@@ -114,7 +114,7 @@ module xkcd
         character(len=:), allocatable :: img
         character(len=:), allocatable :: title
         character(len=:), allocatable :: day
-    end type data_type
+    end type xkcd_data_type
 
     public  :: xkcd_fetch_json
     public  :: xkcd_fetch_png
@@ -129,19 +129,19 @@ contains
         type(c_ptr),            intent(in), value :: client_data
         integer(kind=c_size_t)                    :: xkcd_json_callback
         character(len=:), allocatable             :: chunk
-        type(data_type), pointer                  :: data
+        type(xkcd_data_type), pointer             :: xkcd_data
 
         xkcd_json_callback = int(0, kind=c_size_t)
 
         if (.not. c_associated(ptr)) return
         if (.not. c_associated(client_data)) return
 
-        call c_f_pointer(client_data, data)
-        if (.not. associated(data)) return
+        call c_f_pointer(client_data, xkcd_data)
+        if (.not. associated(xkcd_data)) return
         call c_f_str_ptr(ptr, chunk, nmemb)
 
-        if (.not. allocated(data%json)) data%json = ''
-        data%json = data%json // chunk
+        if (.not. allocated(xkcd_data%json)) xkcd_data%json = ''
+        xkcd_data%json = xkcd_data%json // chunk
 
         xkcd_json_callback = nmemb
     end function xkcd_json_callback
@@ -175,16 +175,16 @@ contains
         xkcd_png_callback = nmemb
     end function xkcd_png_callback
 
-    subroutine xkcd_fetch_json(num, data, stat)
+    subroutine xkcd_fetch_json(num, xkcd_data, stat)
         use :: json_module
-        integer,                 intent(in)            :: num
-        type(data_type), target, intent(out)           :: data
-        integer,                 intent(out), optional :: stat
-        integer                                        :: rc
-        logical                                        :: found
-        type(c_ptr)                                    :: curl_ptr
-        type(json_file)                                :: json
-        character(len=72)                              :: url
+        integer,                      intent(in)            :: num
+        type(xkcd_data_type), target, intent(out)           :: xkcd_data
+        integer,                      intent(out), optional :: stat
+        character(len=72) :: url
+        integer           :: rc
+        logical           :: found
+        type(c_ptr)       :: curl_ptr
+        type(json_file)   :: json
 
         if (present(stat)) stat = -1
 
@@ -206,28 +206,28 @@ contains
         rc = curl_easy_setopt(curl_ptr, CURLOPT_NOSIGNAL,         int( 1, kind=8))
         rc = curl_easy_setopt(curl_ptr, CURLOPT_CONNECTTIMEOUT,   int(10, kind=8))
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEFUNCTION,    c_funloc(xkcd_json_callback))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA,        c_loc(data))
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA,        c_loc(xkcd_data))
 
         rc = curl_easy_perform(curl_ptr)
         call curl_easy_cleanup(curl_ptr)
 
         if (rc /= CURLE_OK) return
-        if (.not. allocated(data%json)) return
+        if (.not. allocated(xkcd_data%json)) return
 
         call json%initialize()
-        call json%deserialize(data%json)
+        call json%deserialize(xkcd_data%json)
 
-        call json%get('month',      data%month,      found); if (.not. found) return
-        call json%get('num',        data%num,        found); if (.not. found) return
-        call json%get('link',       data%link,       found); if (.not. found) return
-        call json%get('year',       data%year,       found); if (.not. found) return
-        call json%get('news',       data%news,       found); if (.not. found) return
-        call json%get('safe_title', data%safe_title, found); if (.not. found) return
-        call json%get('transcript', data%transcript, found); if (.not. found) return
-        call json%get('alt',        data%alt,        found); if (.not. found) return
-        call json%get('img',        data%img,        found); if (.not. found) return
-        call json%get('title',      data%title,      found); if (.not. found) return
-        call json%get('day',        data%day,        found); if (.not. found) return
+        call json%get('month',      xkcd_data%month,      found); if (.not. found) return
+        call json%get('num',        xkcd_data%num,        found); if (.not. found) return
+        call json%get('link',       xkcd_data%link,       found); if (.not. found) return
+        call json%get('year',       xkcd_data%year,       found); if (.not. found) return
+        call json%get('news',       xkcd_data%news,       found); if (.not. found) return
+        call json%get('safe_title', xkcd_data%safe_title, found); if (.not. found) return
+        call json%get('transcript', xkcd_data%transcript, found); if (.not. found) return
+        call json%get('alt',        xkcd_data%alt,        found); if (.not. found) return
+        call json%get('img',        xkcd_data%img,        found); if (.not. found) return
+        call json%get('title',      xkcd_data%title,      found); if (.not. found) return
+        call json%get('day',        xkcd_data%day,        found); if (.not. found) return
 
         call json%destroy()
 
@@ -396,29 +396,29 @@ program main
     implicit none
     character(len=*), parameter :: PNG_FILE   = '/tmp/xkcd.png'
 
-    character(len=256) :: title
-    integer            :: num
-    integer            :: rc
-    integer(kind=8)    :: client_data(5)
-    type(ctx_type)     :: ctx
-    type(data_type)    :: data
-    type(image_type)   :: image
-    type(x_event)      :: event
+    character(len=256)   :: title
+    integer              :: num
+    integer              :: rc
+    integer(kind=8)      :: client_data(5)
+    type(ctx_type)       :: ctx
+    type(image_type)     :: image
+    type(x_event)        :: event
+    type(xkcd_data_type) :: xkcd_data
 
     num = get_opt()
 
-    call xkcd_fetch_json(num, data, rc)
+    call xkcd_fetch_json(num, xkcd_data, rc)
     if (rc /= 0) stop 'Error: Fetching JSON file failed.'
-    if (data%img(len(data%img) - 3:) /= '.png') stop 'Error: Image not in PNG format.'
+    if (xkcd_data%img(len(xkcd_data%img) - 3:) /= '.png') stop 'Error: Image not in PNG format.'
 
-    call xkcd_fetch_png(data%img, PNG_FILE, rc)
+    call xkcd_fetch_png(xkcd_data%img, PNG_FILE, rc)
     if (rc /= 0) stop 'Error: Fetching PNG file failed.'
 
     if (rc == 0) then
-        print '(a, " (", i0, ")")', data%title, data%num
-        print '("Alt: ", a)', data%alt
+        print '(a, " (", i0, ")")', xkcd_data%title, xkcd_data%num
+        print '("Alt: ", a)', xkcd_data%alt
 
-        write (title, '("xkcd (", i0, ") - ", a)', iostat=rc) data%num, data%title
+        write (title, '("xkcd (", i0, ") - ", a)', iostat=rc) xkcd_data%num, xkcd_data%title
 
         if (rc == 0) call xwin_load_png(image, PNG_FILE, rc)
         if (rc == 0) call xwin_create(ctx, image%width, image%height, trim(title), rc)
