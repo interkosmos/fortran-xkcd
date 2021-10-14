@@ -407,7 +407,7 @@ program main
 
     call xkcd_fetch_json(num, data, rc)
     if (rc /= 0) stop 'Error: Fetching JSON file failed.'
-    if (data%img(len(data%img) - 2:) /= 'png') stop 'Error: Image is in JPEG format (unsupported).'
+    if (data%img(len(data%img) - 3:) /= '.png') stop 'Error: Image not in PNG format.'
 
     call xkcd_fetch_png(data%img, PNG_FILE, rc)
     if (rc /= 0) stop 'Error: Fetching PNG file failed.'
