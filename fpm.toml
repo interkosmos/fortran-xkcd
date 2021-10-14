@@ -1,0 +1,19 @@
+name = "fortran-xkcd"
+version = "0.1.0"
+license = "ISC"
+author = "Philipp Engel"
+maintainer = "@interkosmos"
+copyright = "Copyright (c) 2021, Philipp Engel"
+description = "X11 program written in Fortran 2008 that displays the latest xkcd comic."
+keywords = ["xkcd", "x11", "cairo", "curl", "json"]
+
+[dependencies]
+fortran-curl = { git = "https://github.com/interkosmos/fortran-curl.git" }
+fortran-xlib = { git = "https://github.com/interkosmos/fortran-xlib.git" }
+json-fortran = { git = "https://github.com/jacobwilliams/json-fortran.git" }
+
+[[executable]]
+name = "xkcd"
+source-dir = "src"
+main = "xkcd.f90"
+link = ["curl", "cairo", "X11"]
