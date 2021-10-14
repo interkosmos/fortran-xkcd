@@ -17,14 +17,14 @@ module cairo
     public :: cairo_xlib_surface_create
 
     interface
-        ! cairo_t * cairo_create(cairo_surface_t *target)
+        ! cairo_t *cairo_create(cairo_surface_t *target)
         function cairo_create(target) bind(c, name='cairo_create')
             import :: c_ptr
             type(c_ptr), intent(in), value :: target
             type(c_ptr)                    :: cairo_create
         end function cairo_create
 
-        ! cairo_surface_t * cairo_image_surface_create_from_png(const char *filename)
+        ! cairo_surface_t *cairo_image_surface_create_from_png(const char *filename)
         function cairo_image_surface_create_from_png(filename) bind(c, name='cairo_image_surface_create_from_png')
             import :: c_char, c_ptr
             character(kind=c_char), intent(in) :: filename
@@ -52,7 +52,7 @@ module cairo
             integer(kind=c_int)            :: cairo_surface_status
         end function cairo_surface_status
 
-        ! cairo_surface_t * cairo_xlib_surface_create(Display *dpy, Drawable drawable, Visual *visual, int width, int height)
+        ! cairo_surface_t *cairo_xlib_surface_create(Display *dpy, Drawable drawable, Visual *visual, int width, int height)
         function cairo_xlib_surface_create(dpy, drawable, visual, width, height) bind(c, name='cairo_xlib_surface_create')
             import :: c_int, c_long, c_ptr
             type(c_ptr),          intent(in), value :: dpy
@@ -180,11 +180,11 @@ contains
         integer,                      intent(in)            :: num
         type(xkcd_data_type), target, intent(out)           :: xkcd_data
         integer,                      intent(out), optional :: stat
-        character(len=72) :: url
-        integer           :: rc
-        logical           :: found
-        type(c_ptr)       :: curl_ptr
-        type(json_file)   :: json
+        character(len=72)                                   :: url
+        integer                                             :: rc
+        logical                                             :: found
+        type(c_ptr)                                         :: curl_ptr
+        type(json_file)                                     :: json
 
         if (present(stat)) stat = -1
 
@@ -414,16 +414,14 @@ program main
     call xkcd_fetch_png(xkcd_data%img, PNG_FILE, rc)
     if (rc /= 0) stop 'Error: Fetching PNG file failed.'
 
-    if (rc == 0) then
-        print '(a, " (", i0, ")")', xkcd_data%title, xkcd_data%num
-        print '("Alt: ", a)', xkcd_data%alt
+    print '(a, " (", i0, ")")', xkcd_data%title, xkcd_data%num
+    print '("Alt: ", a)', xkcd_data%alt
 
-        write (title, '("xkcd (", i0, ") - ", a)', iostat=rc) xkcd_data%num, xkcd_data%title
+    write (title, '("xkcd (", i0, ") - ", a)', iostat=rc) xkcd_data%num, xkcd_data%title
 
-        if (rc == 0) call xwin_load_png(image, PNG_FILE, rc)
-        if (rc == 0) call xwin_create(ctx, image%width, image%height, trim(title), rc)
-        if (rc == 0) call xwin_set_png(ctx, image, 0, 0)
-    end if
+    if (rc == 0) call xwin_load_png(image, PNG_FILE, rc)
+    if (rc == 0) call xwin_create(ctx, image%width, image%height, trim(title), rc)
+    if (rc == 0) call xwin_set_png(ctx, image, 0, 0)
 
     do while (rc == 0)
         call x_next_event(ctx%display, event)
