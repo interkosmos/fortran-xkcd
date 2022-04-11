@@ -1,5 +1,5 @@
 # fortran-xkcd
-An *fpm* example project written in Fortran 2008 that displays the latest
+An *fpm* example project written in Fortran 2018 that displays the latest
 [xkcd](https://xkcd.com/) comic inside an X window. As a limitation, only images
 in PNG format are supported (no JPEG). The alt text will be printed to console.
 
