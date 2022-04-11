@@ -14,6 +14,5 @@ json-fortran = { git = "https://github.com/jacobwilliams/json-fortran.git" }
 
 [[executable]]
 name = "xkcd"
-source-dir = "src"
-main = "xkcd.f90"
+main = "main.f90"
 link = ["curl", "cairo", "X11"]
