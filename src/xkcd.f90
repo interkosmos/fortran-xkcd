@@ -123,21 +123,23 @@ contains
         call json%initialize()
         call json%deserialize(xkcd_data%json)
 
-        call json%get('month',      xkcd_data%month,      found); if (.not. found) return
-        call json%get('num',        xkcd_data%num,        found); if (.not. found) return
-        call json%get('link',       xkcd_data%link,       found); if (.not. found) return
-        call json%get('year',       xkcd_data%year,       found); if (.not. found) return
-        call json%get('news',       xkcd_data%news,       found); if (.not. found) return
-        call json%get('safe_title', xkcd_data%safe_title, found); if (.not. found) return
-        call json%get('transcript', xkcd_data%transcript, found); if (.not. found) return
-        call json%get('alt',        xkcd_data%alt,        found); if (.not. found) return
-        call json%get('img',        xkcd_data%img,        found); if (.not. found) return
-        call json%get('title',      xkcd_data%title,      found); if (.not. found) return
-        call json%get('day',        xkcd_data%day,        found); if (.not. found) return
+        json_block block
+            call json%get('month',      xkcd_data%month,      found); if (.not. found) exit json_block
+            call json%get('num',        xkcd_data%num,        found); if (.not. found) exit json_block
+            call json%get('link',       xkcd_data%link,       found); if (.not. found) exit json_block
+            call json%get('year',       xkcd_data%year,       found); if (.not. found) exit json_block
+            call json%get('news',       xkcd_data%news,       found); if (.not. found) exit json_block
+            call json%get('safe_title', xkcd_data%safe_title, found); if (.not. found) exit json_block
+            call json%get('transcript', xkcd_data%transcript, found); if (.not. found) exit json_block
+            call json%get('alt',        xkcd_data%alt,        found); if (.not. found) exit json_block
+            call json%get('img',        xkcd_data%img,        found); if (.not. found) exit json_block
+            call json%get('title',      xkcd_data%title,      found); if (.not. found) exit json_block
+            call json%get('day',        xkcd_data%day,        found); if (.not. found) exit json_block
+        end block json_block
 
         call json%destroy()
 
-        if (present(stat)) stat = 0
+        if (found .and. present(stat)) stat = 0
     end subroutine xkcd_fetch_json
 
     subroutine xkcd_fetch_png(url, file_path, stat)
@@ -171,9 +173,10 @@ contains
         rc = curl_easy_setopt(curl_ptr, CURLOPT_CONNECTTIMEOUT,   int(10, kind=i8))
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEFUNCTION,    c_funloc(xkcd_png_callback))
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA,        c_loc(file_unit))
-        rc = curl_easy_perform(curl_ptr)
 
+        rc = curl_easy_perform(curl_ptr)
         call curl_easy_cleanup(curl_ptr)
+
         close (file_unit)
 
         if (rc /= CURLE_OK) return

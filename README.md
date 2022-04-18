@@ -23,7 +23,7 @@ Just clone the repository and build the executable with *fpm*:
 ```
 $ git clone https://github.com/interkosmos/fortran-xkcd
 $ cd fortran-xkcd/
-$ fpm build --profile release
+$ fpm build --profile=release
 $ fpm run
 ```
 The binary `xkcd` will we written to `build/<compiler>/app/`.
