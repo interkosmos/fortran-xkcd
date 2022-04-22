@@ -123,7 +123,7 @@ contains
         call json%initialize()
         call json%deserialize(xkcd_data%json)
 
-        json_block block
+        json_block: block
             call json%get('month',      xkcd_data%month,      found); if (.not. found) exit json_block
             call json%get('num',        xkcd_data%num,        found); if (.not. found) exit json_block
             call json%get('link',       xkcd_data%link,       found); if (.not. found) exit json_block
