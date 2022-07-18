@@ -27,7 +27,7 @@ $ cd fortran-xkcd/
 $ fpm build --profile=release
 $ fpm run
 ```
-The binary `xkcd` will we written to `build/<compiler>/app/`.
+The binary `xkcd` will be written to `build/<compiler>/app/`.
 
 ## Licence
 ISC
