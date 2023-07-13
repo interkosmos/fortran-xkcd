@@ -34,8 +34,9 @@ contains
         integer(kind=c_size_t), intent(in), value :: nmemb
         type(c_ptr),            intent(in), value :: client_data
         integer(kind=c_size_t)                    :: xkcd_json_callback
-        character(len=:), allocatable             :: chunk
-        type(xkcd_data_type), pointer             :: xkcd_data
+
+        character(len=:), allocatable :: chunk
+        type(xkcd_data_type), pointer :: xkcd_data
 
         xkcd_json_callback = int(0, kind=c_size_t)
 
@@ -58,9 +59,10 @@ contains
         integer(kind=c_size_t), intent(in), value :: nmemb
         type(c_ptr),            intent(in), value :: client_data
         integer(kind=c_size_t)                    :: xkcd_png_callback
-        character(len=:), allocatable             :: chunk
-        integer, pointer                          :: file_unit
-        integer                                   :: stat
+
+        character(len=:), allocatable :: chunk
+        integer, pointer              :: file_unit
+        integer                       :: stat
 
         xkcd_png_callback = int(0, kind=c_size_t)
 
@@ -86,11 +88,12 @@ contains
         integer,                      intent(in)            :: num
         type(xkcd_data_type), target, intent(out)           :: xkcd_data
         integer,                      intent(out), optional :: stat
-        character(len=72)                                   :: url
-        integer                                             :: rc
-        logical                                             :: found
-        type(c_ptr)                                         :: curl_ptr
-        type(json_file)                                     :: json
+
+        character(len=72) :: url
+        integer           :: rc
+        logical           :: found
+        type(c_ptr)       :: curl_ptr
+        type(json_file)   :: json
 
         if (present(stat)) stat = -1
 
@@ -105,12 +108,12 @@ contains
         curl_ptr = curl_easy_init()
         if (.not. c_associated(curl_ptr)) return
 
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_DEFAULT_PROTOCOL, 'https' // c_null_char)
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_URL,              trim(url) // c_null_char)
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_FOLLOWLOCATION,   int( 1, kind=i8))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_TIMEOUT,          int(10, kind=i8))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_NOSIGNAL,         int( 1, kind=i8))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_CONNECTTIMEOUT,   int(10, kind=i8))
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_DEFAULT_PROTOCOL, 'https')
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_URL,              trim(url))
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_FOLLOWLOCATION,   1)
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_TIMEOUT,          10)
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_NOSIGNAL,         1)
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_CONNECTTIMEOUT,   10)
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEFUNCTION,    c_funloc(xkcd_json_callback))
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA,        c_loc(xkcd_data))
 
@@ -146,9 +149,10 @@ contains
         character(len=*), intent(in)            :: url
         character(len=*), intent(in)            :: file_path
         integer,          intent(out), optional :: stat
-        integer, target                         :: file_unit
-        integer                                 :: rc
-        type(c_ptr)                             :: curl_ptr
+
+        integer, target :: file_unit
+        integer         :: rc
+        type(c_ptr)     :: curl_ptr
 
         if (present(stat)) stat = -1
         if (len_trim(url) == 0) return
@@ -165,12 +169,12 @@ contains
         curl_ptr = curl_easy_init()
         if (.not. c_associated(curl_ptr)) return
 
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_DEFAULT_PROTOCOL, 'https' // c_null_char)
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_URL,              trim(url) // c_null_char)
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_FOLLOWLOCATION,   int( 1, kind=i8))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_TIMEOUT,          int(10, kind=i8))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_NOSIGNAL,         int( 1, kind=i8))
-        rc = curl_easy_setopt(curl_ptr, CURLOPT_CONNECTTIMEOUT,   int(10, kind=i8))
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_DEFAULT_PROTOCOL, 'https')
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_URL,              trim(url))
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_FOLLOWLOCATION,   1)
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_TIMEOUT,          10)
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_NOSIGNAL,         1)
+        rc = curl_easy_setopt(curl_ptr, CURLOPT_CONNECTTIMEOUT,   10)
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEFUNCTION,    c_funloc(xkcd_png_callback))
         rc = curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA,        c_loc(file_unit))
 

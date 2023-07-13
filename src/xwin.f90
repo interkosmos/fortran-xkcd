@@ -1,19 +1,18 @@
 module xwin
     use, intrinsic :: iso_c_binding
-    use, intrinsic :: iso_fortran_env, only: i8 => int64
     use :: cairo
     use :: xlib
     implicit none (type, external)
     private
 
     type, public :: ctx_type
-        type(c_ptr)      :: cairo
-        type(c_ptr)      :: surface
-        type(c_ptr)      :: display
-        integer          :: screen
-        integer(kind=i8) :: root
-        integer(kind=i8) :: window
-        integer(kind=i8) :: wm_delete_window
+        type(c_ptr)          :: cairo
+        type(c_ptr)          :: surface
+        type(c_ptr)          :: display
+        integer              :: screen
+        integer(kind=c_long) :: root
+        integer(kind=c_long) :: window
+        integer(kind=c_long) :: wm_delete_window
     end type ctx_type
 
     type, public :: image_type
@@ -34,7 +33,7 @@ contains
         character(len=*), intent(in)            :: title
         integer,          intent(out), optional :: stat
         integer                                 :: rc
-        integer(kind=i8)                        :: black, white
+        integer(kind=c_long)                    :: black, white
         type(x_size_hints)                      :: size_hints
 
         if (present(stat)) stat = -1
