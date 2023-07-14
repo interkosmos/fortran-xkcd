@@ -6,19 +6,19 @@ module xwin
     private
 
     type, public :: ctx_type
-        type(c_ptr)          :: cairo
-        type(c_ptr)          :: surface
-        type(c_ptr)          :: display
-        integer              :: screen
-        integer(kind=c_long) :: root
-        integer(kind=c_long) :: window
-        integer(kind=c_long) :: wm_delete_window
+        type(c_ptr)          :: cairo            = c_null_ptr
+        type(c_ptr)          :: surface          = c_null_ptr
+        type(c_ptr)          :: display          = c_null_ptr
+        integer              :: screen           = 0
+        integer(kind=c_long) :: root             = 0
+        integer(kind=c_long) :: window           = 0
+        integer(kind=c_long) :: wm_delete_window = 0
     end type ctx_type
 
     type, public :: image_type
-        type(c_ptr) :: surface
-        integer     :: width
-        integer     :: height
+        type(c_ptr) :: surface = c_null_ptr
+        integer     :: width   = 0
+        integer     :: height  = 0
     end type image_type
 
     public :: xwin_create
