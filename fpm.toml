@@ -8,9 +8,10 @@ description = "X11 program written in Fortran 2008 that displays the latest xkcd
 keywords = ["xkcd", "x11", "cairo", "curl", "json"]
 
 [dependencies]
-fortran-curl = { git = "https://github.com/interkosmos/fortran-curl.git" }
 fortran-xlib = { git = "https://github.com/interkosmos/fortran-xlib.git" }
 json-fortran = { git = "https://github.com/jacobwilliams/json-fortran.git" }
+http = {git = "https://github.com/fortran-lang/http-client.git"}
+stdlib = "*"
 
 [[executable]]
 name = "xkcd"
