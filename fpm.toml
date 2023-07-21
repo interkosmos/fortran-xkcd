@@ -1,17 +1,17 @@
 name = "fortran-xkcd"
-version = "0.1.0"
+version = "0.2.0"
 license = "ISC"
 author = "Philipp Engel"
 maintainer = "@interkosmos"
 copyright = "Copyright (c) 2021, Philipp Engel"
 description = "X11 program written in Fortran 2008 that displays the latest xkcd comic."
-keywords = ["xkcd", "x11", "cairo", "curl", "json"]
+keywords = ["xkcd", "x11", "cairo", "http", "json"]
 
 [dependencies]
 fortran-xlib = { git = "https://github.com/interkosmos/fortran-xlib.git" }
 json-fortran = { git = "https://github.com/jacobwilliams/json-fortran.git" }
-http = {git = "https://github.com/fortran-lang/http-client.git"}
-stdlib = "*"
+http = { git = "https://github.com/fortran-lang/http-client.git" }
+stdlib = { git = "https://github.com/fortran-lang/stdlib.git", branch="stdlib-fpm" }
 
 [[executable]]
 name = "xkcd"

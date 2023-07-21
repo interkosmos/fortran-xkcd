@@ -1,5 +1,5 @@
 module xkcd
-    use http, only : request, response_type
+    use :: http, only: request, response_type
     implicit none (type, external)
     private
 
@@ -23,35 +23,32 @@ module xkcd
 
     public  :: xkcd_fetch_json
     public  :: xkcd_fetch_png
-
 contains
-
     subroutine xkcd_fetch_json(num, xkcd_data, stat)
         use :: json_module
-        integer,                      intent(in)            :: num
-        type(xkcd_data_type),         intent(out)           :: xkcd_data
-        integer,                      intent(out), optional :: stat
+        integer,              intent(in)            :: num
+        type(xkcd_data_type), intent(out)           :: xkcd_data
+        integer,              intent(out), optional :: stat
 
+        character(len=72)   :: url
+        integer             :: status
+        logical             :: found
+        type(json_file)     :: json
         type(response_type) :: response
-        character(len=72) :: url
-        integer           :: rc
-        logical           :: found
-        type(json_file)   :: json
 
         if (present(stat)) stat = -1
 
         if (num > 0) then
-            write (url, '(a, i0, "/", a)', iostat=rc) API_BASE, num, API_JSON
+            write (url, '(a, i0, "/", a)', iostat=status) API_BASE, num, API_JSON
         else
-            write (url, '(2a)', iostat=rc) API_BASE, API_JSON
+            write (url, '(2a)', iostat=status) API_BASE, API_JSON
         end if
 
-        if (rc /= 0) return
+        if (status /= 0) return
 
         response = request(url=trim(url))
         xkcd_data%json = response%content
-
-        if (.not. allocated(xkcd_data%json)) return
+        if (len(xkcd_data%json) == 0) return
 
         call json%initialize()
         call json%deserialize(xkcd_data%json)
@@ -80,10 +77,9 @@ contains
         character(len=*), intent(in)            :: file_path
         integer,          intent(out), optional :: stat
 
+        integer             :: file_unit
+        integer             :: status
         type(response_type) :: response
-        integer, target :: file_unit
-        integer         :: rc
-        integer :: status
 
         if (present(stat)) stat = -1
         if (len_trim(url) == 0) return
@@ -92,22 +88,18 @@ contains
               action  = 'write', &
               file    = trim(file_path), &
               form    = 'unformatted', &
-              iostat  = rc, &
+              iostat  = status, &
               newunit = file_unit, &
               status  = 'replace')
-        if (rc /= 0) return
-
-        response = request(url=trim(url))
-
-        inquire (unit=file_unit, iostat=status)
         if (status /= 0) return
 
-        write (file_unit, iostat=stat) response%content
-        if (stat /= 0) return
+        response = request(url=trim(url))
+        if (.not. response%ok) return
 
+        write (file_unit, iostat=status) response%content
         close (file_unit)
 
-        if (.not. response%ok) return
+        if (status /= 0) return
         if (present(stat)) stat = 0
     end subroutine xkcd_fetch_png
 end module xkcd

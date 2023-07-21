@@ -32,9 +32,10 @@ contains
         integer,          intent(in)            :: height
         character(len=*), intent(in)            :: title
         integer,          intent(out), optional :: stat
-        integer                                 :: rc
-        integer(kind=c_long)                    :: black, white
-        type(x_size_hints)                      :: size_hints
+
+        integer              :: rc
+        integer(kind=c_long) :: black, white
+        type(x_size_hints)   :: size_hints
 
         if (present(stat)) stat = -1
 
