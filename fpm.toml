@@ -5,15 +5,15 @@ author = "Philipp Engel"
 maintainer = "@interkosmos"
 copyright = "Copyright (c) 2021, Philipp Engel"
 description = "X11 program written in Fortran 2008 that displays the latest xkcd comic."
-keywords = ["xkcd", "x11", "cairo", "http", "json"]
+keywords = [ "xkcd", "x11", "cairo", "http", "http-client", "json" ]
 
 [dependencies]
 fortran-xlib = { git = "https://github.com/interkosmos/fortran-xlib.git" }
 json-fortran = { git = "https://github.com/jacobwilliams/json-fortran.git" }
 http = { git = "https://github.com/fortran-lang/http-client.git" }
-stdlib = { git = "https://github.com/fortran-lang/stdlib.git", branch="stdlib-fpm" }
+stdlib = "*"
 
 [[executable]]
 name = "xkcd"
 main = "main.f90"
-link = ["curl", "cairo", "X11"]
+link = [ "curl", "cairo", "X11" ]
